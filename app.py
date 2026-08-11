@@ -1,7 +1,7 @@
 import json
 import os
 import streamlit as st
-from groq import Groq
+from ava import ask_ava
 
 
 # =========================================================
@@ -15,11 +15,7 @@ st.set_page_config(
 )
 
 
-# =========================================================
-# GROQ AI
-# =========================================================
 
-client = Groq(api_key=st.secrets["Groq_API_KEY"])
 
 
 # =========================================================
@@ -571,30 +567,22 @@ elif menu == "🤖 AI Assistant (Ava)":
             response_placeholder.markdown(
                 "Ava is thinking..."
             )
+        try:
+            response = ask_ava(
+                user_message=prompt,
+                conversation=st.session_state.ava_messages[:-1]
+            )
 
-            try:
+            response_placeholder.markdown(response)
 
-                completion = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=st.session_state.ava_messages,
-                    temperature=0.7,
-                )
+            st.session_state.ava_messages.append(
+                {
+                    "role": "assistant",
+                    "content": response
+                }
+            )
 
-                reply = completion.choices[0].message.content
-
-                response_placeholder.markdown(
-                    reply
-                )
-
-                st.session_state.ava_messages.append(
-                    {
-                        "role": "assistant",
-                        "content": reply,
-                    }
-                )
-
-            except Exception as e:
-
-                response_placeholder.error(
-                    f"Error connecting to Groq. Details: {e}"
-                )
+        except Exception as e:
+            response_placeholder.error(
+                f"Error connecting to Ava: {e}"
+            )
