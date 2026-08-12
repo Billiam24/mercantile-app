@@ -2,6 +2,7 @@ import json
 import os
 import streamlit as st
 from ava import ask_ava
+from database import add_inventory, get_inventory
 
 
 # =========================================================
@@ -401,21 +402,11 @@ elif menu == "📦 Inventory":
 
         if submit_inv and item_name:
 
-            inventory = load_data(
-                INVENTORY_FILE
-            )
-
-            inventory.append(
-                {
-                    "name": item_name,
-                    "quantity": quantity,
-                    "location": location,
-                }
-            )
-
-            save_data(
-                INVENTORY_FILE,
-                inventory
+            add_inventory(
+                item_name,
+                quantity,
+                location,
+                ""
             )
 
             st.success(
@@ -432,18 +423,16 @@ elif menu == "📦 Inventory":
 
     st.subheader(
         "Current Inventory List"
-    )
+    ) 
 
-    inventory = load_data(
-        INVENTORY_FILE
-    )
+    inventory = get_inventory()
 
     if inventory:
 
         for item in inventory:
 
             st.write(
-                f"🔹 **{item['name']}** "
+                f"🔹 **{item['item_name']}** "
                 f"(Qty: {item['quantity']}) — "
                 f"Located at: {item['location']}"
             )
@@ -453,17 +442,6 @@ elif menu == "📦 Inventory":
         st.info(
             "No inventory items logged yet."
         )
-
-
-# =========================================================
-# 8. FARMERS MARKET
-# =========================================================
-
-elif menu == "💰 Farmers Market":
-
-    st.header("💰 Farmers Market")
-
-    st.info(
         "Farmers Market tools are coming next. "
         "This section can eventually track products, prices, "
         "customers, sales, and market inventory."
