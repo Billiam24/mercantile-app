@@ -109,7 +109,7 @@ if menu == "🏡 Dashboard":
     with col3:
         st.metric(
             "📦 Inventory Items",
-            len(inventory)
+            len(inventory),
         )
 
     st.divider()
@@ -442,6 +442,17 @@ elif menu == "📦 Inventory":
         st.info(
             "No inventory items logged yet."
         )
+
+
+# =========================================================
+# 8. FARMERS MARKET
+# =========================================================
+
+elif menu == "💰 Farmers Market":
+
+    st.header("💰 Farmers Market")
+
+    st.info(
         "Farmers Market tools are coming next. "
         "This section can eventually track products, prices, "
         "customers, sales, and market inventory."
@@ -545,22 +556,23 @@ elif menu == "🤖 AI Assistant (Ava)":
             response_placeholder.markdown(
                 "Ava is thinking..."
             )
-        try:
-            response = ask_ava(
-                user_message=prompt,
-                conversation=st.session_state.ava_messages[:-1]
-            )
 
-            response_placeholder.markdown(response)
+            try:
+                response = ask_ava(
+                    user_message=prompt,
+                    conversation=st.session_state.ava_messages[:-1]
+                )
 
-            st.session_state.ava_messages.append(
-                {
-                    "role": "assistant",
-                    "content": response
-                }
-            )
+                response_placeholder.markdown(response)
 
-        except Exception as e:
-            response_placeholder.error(
-                f"Error connecting to Ava: {e}"
-            )
+                st.session_state.ava_messages.append(
+                    {
+                        "role": "assistant",
+                        "content": response
+                    }
+                )
+
+            except Exception as e:
+                response_placeholder.error(
+                    f"Error connecting to Ava: {e}"
+                )
