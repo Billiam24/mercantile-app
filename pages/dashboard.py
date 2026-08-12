@@ -115,4 +115,3 @@ def render_dashboard():
         Homestead questions • Garden help • Animal questions • Planning assistance
         """
     )
-    render_dashboard()

@@ -1,6 +1,8 @@
 import json
 import os
+
 import streamlit as st
+
 from ava import ask_ava
 from database import add_inventory, get_inventory
 
@@ -90,7 +92,11 @@ if menu == "🏡 Dashboard":
 
     notes_list = load_data(NOTES_FILE)
     med_list = load_data(MEDICAL_FILE)
-    inventory = load_data(INVENTORY_FILE)
+
+    try:
+        inventory_count = len(get_inventory())
+    except Exception:
+        inventory_count = len(load_data(INVENTORY_FILE))
 
     col1, col2, col3 = st.columns(3)
 
@@ -109,7 +115,7 @@ if menu == "🏡 Dashboard":
     with col3:
         st.metric(
             "📦 Inventory Items",
-            len(inventory),
+            inventory_count,
         )
 
     st.divider()
@@ -504,21 +510,7 @@ elif menu == "🤖 AI Assistant (Ava)":
     )
 
     if "ava_messages" not in st.session_state:
-
-        st.session_state.ava_messages = [
-            {
-                "role": "system",
-                "content": (
-                    "You are Ava, a technical livestock and homestead "
-                    "reference assistant. Provide practical, educational "
-                    "information about homesteading, livestock, animal "
-                    "care, gardening, and related topics. Clearly "
-                    "distinguish general educational information from "
-                    "situations requiring a veterinarian or other "
-                    "qualified professional."
-                ),
-            }
-        ]
+        st.session_state.ava_messages = []
 
     for message in st.session_state.ava_messages:
 
@@ -560,7 +552,7 @@ elif menu == "🤖 AI Assistant (Ava)":
             try:
                 response = ask_ava(
                     user_message=prompt,
-                    conversation=st.session_state.ava_messages[:-1]
+                    conversation=st.session_state.ava_messages[:-1],
                 )
 
                 response_placeholder.markdown(response)

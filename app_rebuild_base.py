@@ -442,6 +442,17 @@ elif menu == "📦 Inventory":
         st.info(
             "No inventory items logged yet."
         )
+
+
+# =========================================================
+# 8. FARMERS MARKET
+# =========================================================
+
+elif menu == "💰 Farmers Market":
+
+    st.header("💰 Farmers Market")
+
+    st.info(
         "Farmers Market tools are coming next. "
         "This section can eventually track products, prices, "
         "customers, sales, and market inventory."
