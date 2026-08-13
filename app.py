@@ -1,8 +1,6 @@
 import json
 import os
-
 import streamlit as st
-
 from ava import ask_ava
 from database import add_inventory, get_inventory
 
@@ -92,11 +90,7 @@ if menu == "🏡 Dashboard":
 
     notes_list = load_data(NOTES_FILE)
     med_list = load_data(MEDICAL_FILE)
-
-    try:
-        inventory_count = len(get_inventory())
-    except Exception:
-        inventory_count = len(load_data(INVENTORY_FILE))
+    inventory = load_data(INVENTORY_FILE)
 
     col1, col2, col3 = st.columns(3)
 
@@ -115,7 +109,7 @@ if menu == "🏡 Dashboard":
     with col3:
         st.metric(
             "📦 Inventory Items",
-            inventory_count,
+            len(inventory)
         )
 
     st.divider()
@@ -510,7 +504,21 @@ elif menu == "🤖 AI Assistant (Ava)":
     )
 
     if "ava_messages" not in st.session_state:
-        st.session_state.ava_messages = []
+
+        st.session_state.ava_messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are Ava, a technical livestock and homestead "
+                    "reference assistant. Provide practical, educational "
+                    "information about homesteading, livestock, animal "
+                    "care, gardening, and related topics. Clearly "
+                    "distinguish general educational information from "
+                    "situations requiring a veterinarian or other "
+                    "qualified professional."
+                ),
+            }
+        ]
 
     for message in st.session_state.ava_messages:
 
@@ -548,23 +556,22 @@ elif menu == "🤖 AI Assistant (Ava)":
             response_placeholder.markdown(
                 "Ava is thinking..."
             )
+        try:
+            response = ask_ava(
+                user_message=prompt,
+                conversation=st.session_state.ava_messages[:-1]
+            )
 
-            try:
-                response = ask_ava(
-                    user_message=prompt,
-                    conversation=st.session_state.ava_messages[:-1],
-                )
+            response_placeholder.markdown(response)
 
-                response_placeholder.markdown(response)
+            st.session_state.ava_messages.append(
+                {
+                    "role": "assistant",
+                    "content": response
+                }
+            )
 
-                st.session_state.ava_messages.append(
-                    {
-                        "role": "assistant",
-                        "content": response
-                    }
-                )
-
-            except Exception as e:
-                response_placeholder.error(
-                    f"Error connecting to Ava: {e}"
-                )
+        except Exception as e:
+            response_placeholder.error(
+                f"Error connecting to Ava: {e}"
+            )
